@@ -2,6 +2,7 @@ import Skeleton from '@mui/material/Skeleton';
 import { useCreateComment, useDeleteComment } from '@frontend/shared/hooks/comment/createComment';
 import { useRouter } from 'next/router';
 import { useGetComments, useGetActionCounts } from '@frontend/shared/hooks/comment/getComment';
+import { useState } from 'react';
 import CommentInput from './CommentInput';
 import DisplayComment from './DisplayComment';
 import ErrorLoading from '../common/ErrorLoading';
@@ -55,13 +56,25 @@ export default function CommentsList({
   const handleChange = (e) => {
     setInputVal(e);
   };
+  const [hideParentCommentInput, setHideParentCommentInput] = useState(false);
 
   return (
     <div className="pt-1 mb-2">
+      {showInput && !hideParentCommentInput && (
+        <div>
+          <CommentInput
+            loading={submitLoading}
+            handleChange={handleChange}
+            onClick={handleSave}
+            inputVal={inputVal}
+            label={label}
+          />
+        </div>
+      )}
       <div
         style={{
           overflow: 'auto',
-          maxHeight: '40vh',
+          maxHeight: '100vh',
         }}
       >
         {error || !data?.getCommentsByThreadId ? (
@@ -82,22 +95,14 @@ export default function CommentsList({
                 itemSlug={itemSlug}
                 shareIndex={shareIndex}
                 fieldTitle={fieldTitle}
+                // toggling the state of Parent Comment Input
+                setHideParentCommentInput={setHideParentCommentInput}
               />
             </div>
           ))
         )}
       </div>
-      {showInput && (
-        <div>
-          <CommentInput
-            loading={submitLoading}
-            handleChange={handleChange}
-            onClick={handleSave}
-            inputVal={inputVal}
-            label={label}
-          />
-        </div>
-      )}
+
       <Backdrop open={deleteLoading || submitLoading} />
     </div>
   );
